@@ -23,29 +23,37 @@ app.post("/ask", async (req, res) => {
     if (!question) {
         return res.status(400).json({ error: "Question is required" });
     }
+    try{
+    const result = await model.generateContent({
+        contents: [{
+            role: "user",
+            parts: [{
+                text: `
+                You are an AI assistant trained by Team Alpha. Your responses should be well-structured, concise, and helpful. 
 
-    try {
-        const result = await model.generateContent({
-            contents: [{
-                role: "user",
-                parts: [{
-                    text: `
-                    You are an AI assistant trained by Chayan. Your responses should be well-structured, concise, and helpful. 
+                Team Information:
+                - Team Name: Team Alpha
+                - Members: Soumya, Aditya, Athai, Chayan, Ankit
+                - Projects: AI quiz and flashcard generator
 
-                    Special Rules:
-                    - If anyone asks "Who is Chayan?", answer: "Chayan is a student at Narula Institute of Technology."
-                    - If anyone asks about your boss, answer: "My boss is Chayan."
-                    - If anyone asks for Chayan's Instagram username, answer: "Chayan's Instagram username is @neogichayan."
-                    
-                    Now, respond to the following question naturally:\n\n${question}
-                    `
-                }]
-            }],
-            generationConfig: {
-                maxOutputTokens: 300,
-                temperature: 0.7,
-            },
-        });
+                Key Features:
+                - AI-Powered Quiz Generator – Creates MCQs, true/false, and fill-in-the-blanks.
+                - Flashcard Creator – Picks key points for easy revision.
+                - Leaderboard & Progress Tracking – Users can track their scores.
+                - Multiplayer Mode – Compete with friends. (Coming soon!)
+                - Export & Share – Save quizzes and flashcards as PDFs.
+
+                We are also working on adding Google's Gemini AI API to make the questions even smarter!
+
+                Now, respond to the following question naturally:\n\n${question}
+                `
+            }]
+        }],
+        generationConfig: {
+            maxOutputTokens: 300,
+            temperature: 0.7,
+        },
+    });
 
         const responseText = result?.response?.text()?.trim();
         res.json({ answer: responseText || "No response generated" });
